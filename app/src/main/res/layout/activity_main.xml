@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -9,71 +10,81 @@
         android:orientation="vertical"
         android:padding="20dp">
 
+        <!-- 🔷 TITLE -->
         <TextView
             android:id="@+id/titleText"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="GEC Campus Complaint Tracker"
+            android:text="GEC Complaint Tracker"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
+            android:textAlignment="center"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="20dp" />
 
+
+        <!-- Student Name -->
         <EditText
             android:id="@+id/etName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Student Name"/>
+            android:hint="Student Name" />
 
+        <EditText
+            android:id="@+id/etEnrollment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enrollment Number"
+            android:inputType="number"
+            android:layout_marginTop="10dp" />
+
+
+        <!-- Department -->
         <EditText
             android:id="@+id/etDepartment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Department"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp" />
 
+        <!-- Complaint -->
         <EditText
             android:id="@+id/etComplaint"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:hint="Describe your complaint"
-            android:layout_marginTop="10dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Complaint Addressed To"
-            android:textStyle="bold"
-            android:layout_marginTop="12dp"/>
+            android:hint="Describe your complaint"
+            android:minLines="3"
+            android:layout_marginTop="10dp" />
 
+        <!-- Authority -->
         <Spinner
             android:id="@+id/spinnerDepartment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"/>
+            android:layout_marginTop="12dp" />
 
-        <!-- ✅ SELECT IMAGE BUTTON -->
+        <!-- Image Preview -->
+        <ImageView
+            android:id="@+id/imgPreview"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="10dp" />
+
+        <!-- Buttons -->
         <Button
             android:id="@+id/btnSelectImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Select Image"
-            android:layout_marginTop="12dp"/>
-
-        <!-- ✅ IMAGE PREVIEW -->
-        <ImageView
-            android:id="@+id/imgPreview"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:visibility="gone"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="12dp" />
 
         <Button
             android:id="@+id/btnSubmit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Submit Complaint"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="10dp" />
 
     </LinearLayout>
 </ScrollView>

@@ -1,8 +1,5 @@
 package com.gec.geccomplainttracker
 
-import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -10,81 +7,106 @@ import com.google.firebase.database.FirebaseDatabase
 
 class MainActivity : AppCompatActivity() {
 
-    private var imageUri: Uri? = null
-    private val IMAGE_REQUEST = 100
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val name = findViewById<EditText>(R.id.etName)
-        val dept = findViewById<EditText>(R.id.etDepartment)
-        val complaint = findViewById<EditText>(R.id.etComplaint)
+        // 🔹 Views
+        val etName = findViewById<EditText>(R.id.etName)
+        val etEnrollment = findViewById<EditText>(R.id.etEnrollment)
+        val etDepartment = findViewById<EditText>(R.id.etDepartment)
+        val etComplaint = findViewById<EditText>(R.id.etComplaint)
         val spinner = findViewById<Spinner>(R.id.spinnerDepartment)
-        val selectImage = findViewById<Button>(R.id.btnSelectImage)
-        val submit = findViewById<Button>(R.id.btnSubmit)
-        val imageView = findViewById<ImageView>(R.id.imgPreview)
+        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
 
-        // Spinner data
-        val departments = arrayOf(
+        // 🔹 Spinner data
+        val authorities = arrayOf(
             "Select Authority",
-            "Electrical Department",
-            "Plumbing Department",
-            "IT Cell",
-            "Housekeeping",
-            "Civil / Infrastructure"
+            "IT cell",
+            "Civil",
+            "House keeping",
+            "Hostel",
+            "Library"
         )
 
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
-            departments
+            authorities
         )
         spinner.adapter = adapter
 
-        val dbRef = FirebaseDatabase.getInstance().getReference("complaints")
+        // 🔹 Firebase reference
+        val database = FirebaseDatabase.getInstance()
+        val complaintRef = database.getReference("complaints")
 
-        selectImage.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, IMAGE_REQUEST)
+        // 🔹 Image button (MVP – no upload yet)
+        btnSelectImage.setOnClickListener {
+            Toast.makeText(this, "Image feature coming soon", Toast.LENGTH_SHORT).show()
         }
 
-        submit.setOnClickListener {
+        // 🔹 Submit button
+        btnSubmit.setOnClickListener {
 
-            if (spinner.selectedItemPosition == 0) {
+            val name = etName.text.toString().trim()
+            val enrollment = etEnrollment.text.toString().trim()
+            val department = etDepartment.text.toString().trim()
+            val complaint = etComplaint.text.toString().trim()
+            val authority = spinner.selectedItem.toString()
+
+            // 🔴 Validation
+            if (name.isEmpty()) {
+                etName.error = "Enter name"
+                return@setOnClickListener
+            }
+
+            if (enrollment.isEmpty()) {
+                etEnrollment.error = "Enter enrollment number"
+                return@setOnClickListener
+            }
+
+            if (complaint.isEmpty()) {
+                etComplaint.error = "Enter complaint"
+                return@setOnClickListener
+            }
+
+            if (authority == "Select Authority") {
                 Toast.makeText(this, "Please select authority", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val data = HashMap<String, String>()
-            data["name"] = name.text.toString()
-            data["department"] = dept.text.toString()
-            data["complaint"] = complaint.text.toString()
-            data["addressedTo"] = spinner.selectedItem.toString()
-            data["imageSelected"] = if (imageUri != null) "Yes" else "No"
-            data["status"] = "Pending"
+            // 🔹 Create unique ID
+            val complaintId = complaintRef.push().key
 
-            dbRef.push().setValue(data)
+            if (complaintId != null) {
 
-            Toast.makeText(this, "Complaint Submitted", Toast.LENGTH_SHORT).show()
+                val complaintData = mapOf(
+                    "studentName" to name,
+                    "enrollmentNumber" to enrollment,
+                    "department" to department,
+                    "complaintText" to complaint,
+                    "authority" to authority,
+                    "status" to "Pending"
+                )
 
-            name.text.clear()
-            dept.text.clear()
-            complaint.text.clear()
-            spinner.setSelection(0)
-            imageView.visibility = ImageView.GONE
-            imageUri = null
+                // 🔹 Save to Firebase
+                complaintRef.child(complaintId).setValue(complaintData)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Complaint submitted successfully", Toast.LENGTH_LONG).show()
+
+                        // Clear fields
+                        etName.text.clear()
+                        etEnrollment.text.clear()
+                        etDepartment.text.clear()
+                        etComplaint.text.clear()
+                        spinner.setSelection(0)
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Failed to submit complaint", Toast.LENGTH_SHORT).show()
+                    }
+            }
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-            imageUri = data?.data
-            val imageView = findViewById<ImageView>(R.id.imgPreview)
-            imageView.setImageURI(imageUri)
-            imageView.visibility = ImageView.VISIBLE
-        }
-    }
 }
